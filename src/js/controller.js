@@ -23,7 +23,7 @@ const controlRecipes = async () => {
   try {
 
     const id = window.location.hash.slice(1);
-    console.log(id);
+    // console.log(id);
 
     if (!id) return;
     // loading Recipe
@@ -39,4 +39,10 @@ const controlRecipes = async () => {
   }
 }
 
-controlRecipes();
+
+
+function init() {
+  recipeView.addHandlerRender(controlRecipes);
+}
+
+init();
