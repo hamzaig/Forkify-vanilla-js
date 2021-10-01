@@ -2,37 +2,72 @@ import icons from "url:../../img/icons.svg";
 import { Fraction } from "fractional";
 
 class RecipeView {
-    #parentElement = document.querySelector('.recipe');
-    #data;
-    render(data) {
-        this.#data = data;
-        const markup = this.#generateMarkup();
-        this.#clear();
-        this.#parentElement.insertAdjacentHTML("afterbegin", markup);
-    }
+  #parentElement = document.querySelector('.recipe');
+  #data;
+  #errorMessage = "We could not find that recipe. Please try another one!";
+  #message = "";
 
-    #clear() {
-        this.#parentElement.innerHTML = "";
-    }
+  render(data) {
+    this.#data = data;
+    const markup = this.#generateMarkup();
+    this.#clear();
+    this.#parentElement.insertAdjacentHTML("afterbegin", markup);
+  }
 
-    renderSpinner() {
-        const markup = `
+  #clear() {
+    this.#parentElement.innerHTML = "";
+  }
+
+  renderSpinner() {
+    const markup = `
             <div class="spinner">
             <svg>
                 <use href="${icons}#icon-loader"></use>
             </svg>
             </div>
         `;
-        this.#parentElement.innerHTML = "";
-        this.#parentElement.insertAdjacentHTML("afterbegin", markup);
-    }
+    this.#clear();
+    this.#parentElement.insertAdjacentHTML("afterbegin", markup);
+  }
 
-    addHandlerRender(handler) {
-        ["hashchange", "load"].forEach(ev => window.addEventListener(ev, handler))
-    }
+  renderError(message = this.#errorMessage) {
+    const markup = `
+        <div class="error">
+          <div>
+            <svg>
+              <use href="${icons}#icon-alert-triangle"></use>
+            </svg>
+          </div>
+          <p>${message}</p>
+        </div>
+      `;
 
-    #generateMarkup() {
-        return `
+    this.#clear();
+    this.#parentElement.insertAdjacentHTML("afterbegin", markup);
+  }
+
+  renderError(message = this.#message) {
+    const markup = `
+        <div class="message">
+          <div>
+            <svg>
+              <use href="${icons}#icon-smile"></use>
+            </svg>
+          </div>
+          <p>${message}</p>
+        </div>
+      `;
+
+    this.#clear();
+    this.#parentElement.insertAdjacentHTML("afterbegin", markup);
+  }
+
+  addHandlerRender(handler) {
+    ["hashchange", "load"].forEach(ev => window.addEventListener(ev, handler))
+  }
+
+  #generateMarkup() {
+    return `
       <figure class="recipe__fig">
         <img src="${this.#data.image}" alt="${this.#data.title}" class="recipe__img" />
         <h1 class="recipe__title">
@@ -108,11 +143,11 @@ class RecipeView {
         </a>
       </div>
     `;
-    }
+  }
 
 
-    #generateMarkupIngredient(ing) {
-        return `
+  #generateMarkupIngredient(ing) {
+    return `
               <li class="recipe__ingredient">
                 <svg class="recipe__icon">
                   <use href="${icons}#icon-check"></use>
@@ -124,7 +159,7 @@ class RecipeView {
                 </div>
               </li>
             `;
-    }
+  }
 }
 
 export default new RecipeView();
