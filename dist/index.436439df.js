@@ -465,6 +465,8 @@ var _searchView = require("./views/searchView");
 var _searchViewDefault = parcelHelpers.interopDefault(_searchView);
 var _resultView = require("./views/resultView");
 var _resultViewDefault = parcelHelpers.interopDefault(_resultView);
+var _paginationView = require("./views/paginationView");
+var _paginationViewDefault = parcelHelpers.interopDefault(_paginationView);
 const recipeContainer = document.querySelector('.recipe');
 const timeout = function(s) {
     return new Promise(function(_, reject) {
@@ -497,18 +499,24 @@ const controlSearchResults = async ()=>{
         if (!query) return;
         await _model.loadSearchResults(query);
         console.log(_model.state.search.results);
-        _resultViewDefault.default.render(_model.state.search.results);
+        _resultViewDefault.default.render(_model.getSearchResultsPage(3));
+        _paginationViewDefault.default.render(_model.state.search);
     } catch (err) {
         console.log(err);
     }
 };
+const controlPagination = (goToPage)=>{
+    _resultViewDefault.default.render(_model.getSearchResultsPage(goToPage));
+    _paginationViewDefault.default.render(_model.state.search);
+};
 function init() {
     _recipeViewDefault.default.addHandlerRender(controlRecipes);
     _searchViewDefault.default.addHandlerSearch(controlSearchResults);
+    _paginationViewDefault.default.addHanderClick(controlPagination);
 }
 init();
 
-},{"./model":"6Yfb5","./views/recipeView":"9q0mt","core-js/stable":"eIyVg","regenerator-runtime/runtime":"cH8Iq","./views/searchView":"51HTZ","@parcel/transformer-js/src/esmodule-helpers.js":"JacNc","./views/resultView":"dmYXU"}],"6Yfb5":[function(require,module,exports) {
+},{"./model":"6Yfb5","./views/recipeView":"9q0mt","core-js/stable":"eIyVg","regenerator-runtime/runtime":"cH8Iq","./views/searchView":"51HTZ","./views/resultView":"dmYXU","@parcel/transformer-js/src/esmodule-helpers.js":"JacNc","./views/paginationView":"c2v8w"}],"6Yfb5":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "state", ()=>state
@@ -516,6 +524,8 @@ parcelHelpers.export(exports, "state", ()=>state
 parcelHelpers.export(exports, "loadRecipe", ()=>loadRecipe
 );
 parcelHelpers.export(exports, "loadSearchResults", ()=>loadSearchResults
+);
+parcelHelpers.export(exports, "getSearchResultsPage", ()=>getSearchResultsPage
 );
 var _regeneratorRuntime = require("regenerator-runtime");
 var _config = require("./config");
@@ -525,7 +535,9 @@ const state = {
     },
     search: {
         query: "",
-        results: []
+        results: [],
+        page: 1,
+        resultsPerPage: _config.RESULT_PER_PAGE
     }
 };
 const loadRecipe = async function(id) {
@@ -566,6 +578,12 @@ const loadSearchResults = async (query)=>{
         console.log(err);
         throw err;
     }
+};
+const getSearchResultsPage = (page = state.search.page)=>{
+    state.search.page = page;
+    const start = (page - 1) * state.search.resultsPerPage;
+    const end = page * state.search.resultsPerPage;
+    return state.search.results.slice(start, end);
 };
 
 },{"regenerator-runtime":"cH8Iq","./config":"beA2m","./helpers":"9l3Yy","@parcel/transformer-js/src/esmodule-helpers.js":"JacNc"}],"cH8Iq":[function(require,module,exports) {
@@ -1155,8 +1173,11 @@ parcelHelpers.export(exports, "API_URL", ()=>API_URL
 );
 parcelHelpers.export(exports, "TIMEOUT_SECONDS", ()=>TIMEOUT_SECONDS
 );
+parcelHelpers.export(exports, "RESULT_PER_PAGE", ()=>RESULT_PER_PAGE
+);
 const API_URL = "https://forkify-api.herokuapp.com/api/v2/recipes/";
 const TIMEOUT_SECONDS = 10;
+const RESULT_PER_PAGE = 10;
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"JacNc"}],"JacNc":[function(require,module,exports) {
 exports.interopDefault = function(a) {
@@ -1246,7 +1267,7 @@ class RecipeView extends _viewDefault.default {
 }
 exports.default = new RecipeView();
 
-},{"url:../../img/icons.svg":"iwCpK","fractional":"40qvl","@parcel/transformer-js/src/esmodule-helpers.js":"JacNc","./View":"8rtS4"}],"iwCpK":[function(require,module,exports) {
+},{"url:../../img/icons.svg":"iwCpK","fractional":"40qvl","./View":"8rtS4","@parcel/transformer-js/src/esmodule-helpers.js":"JacNc"}],"iwCpK":[function(require,module,exports) {
 module.exports = require('./helpers/bundle-url').getBundleURL('8LZRF') + "icons.c097e590.svg";
 
 },{"./helpers/bundle-url":"8YnfL"}],"8YnfL":[function(require,module,exports) {
@@ -1572,7 +1593,7 @@ class View {
 }
 exports.default = View;
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"JacNc","url:../../img/icons.svg":"iwCpK"}],"eIyVg":[function(require,module,exports) {
+},{"url:../../img/icons.svg":"iwCpK","@parcel/transformer-js/src/esmodule-helpers.js":"JacNc"}],"eIyVg":[function(require,module,exports) {
 require('../modules/es.symbol');
 require('../modules/es.symbol.description');
 require('../modules/es.symbol.async-iterator');
@@ -13595,6 +13616,34 @@ class ResultView extends _viewDefault.default {
 }
 exports.default = new ResultView();
 
-},{"./View":"8rtS4","@parcel/transformer-js/src/esmodule-helpers.js":"JacNc","url:../../img/icons.svg":"iwCpK"}]},["drOo7","jKMjS"], "jKMjS", "parcelRequire3a11")
+},{"./View":"8rtS4","url:../../img/icons.svg":"iwCpK","@parcel/transformer-js/src/esmodule-helpers.js":"JacNc"}],"c2v8w":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _iconsSvg = require("url:../../img/icons.svg");
+var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
+var _view = require("./View");
+var _viewDefault = parcelHelpers.interopDefault(_view);
+class PaginationView extends _viewDefault.default {
+    _parentElement = document.querySelector('.pagination');
+    addHanderClick(handler) {
+        this._parentElement.addEventListener("click", (e)=>{
+            const btn = e.target.closest(".btn--inline");
+            if (!btn) return;
+            const goToPage = +btn.dataset.goto;
+            handler(goToPage);
+        });
+    }
+    _generateMarkup() {
+        const currentPage = this._data.page;
+        const numPages = Math.ceil(this._data.results.length / this._data.resultsPerPage);
+        console.log(numPages);
+        if (currentPage === 1 && numPages > 1) return `\n                <button data-goto="${currentPage + 1}" class="btn--inline pagination__btn--next">\n                    <span>Page ${currentPage + 1}</span>\n                    <svg class="search__icon">\n                    <use href="src/img/icons.svg#icon-arrow-right"></use>\n                    </svg>\n                </button>\n            `;
+        if (currentPage === numPages && numPages > 1) return `\n                <button data-goto="${currentPage - 1}" class="btn--inline pagination__btn--prev">\n                    <svg class="search__icon">\n                        <use href="src/img/icons.svg#icon-arrow-left"></use>\n                    </svg>\n                    <span>Page ${currentPage - 1}</span>\n                </button>\n            `;
+        if (currentPage < numPages && numPages > 1) return `\n                <button data-goto="${currentPage - 1}" class="btn--inline pagination__btn--prev">\n                    <svg class="search__icon">\n                        <use href="src/img/icons.svg#icon-arrow-left"></use>\n                    </svg>\n                    <span>Page ${currentPage - 1}</span>\n                </button>\n                <button data-goto="${currentPage + 1}" class="btn--inline pagination__btn--next">\n                    <span>Page ${currentPage + 1}</span>\n                    <svg class="search__icon">\n                    <use href="src/img/icons.svg#icon-arrow-right"></use>\n                    </svg>\n                </button>\n            `;
+    }
+}
+exports.default = new PaginationView();
+
+},{"url:../../img/icons.svg":"iwCpK","./View":"8rtS4","@parcel/transformer-js/src/esmodule-helpers.js":"JacNc"}]},["drOo7","jKMjS"], "jKMjS", "parcelRequire3a11")
 
 //# sourceMappingURL=index.436439df.js.map
