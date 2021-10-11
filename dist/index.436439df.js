@@ -513,7 +513,8 @@ const controlPagination = (goToPage)=>{
 };
 const controlServings = (newServings)=>{
     _model.updateServings(newServings);
-    _recipeViewDefault.default.render(_model.state.recipe);
+    // recipeView.render(model.state.recipe);
+    _recipeViewDefault.default.update(_model.state.recipe);
 // console.log(model.state);
 };
 function init() {
@@ -1598,6 +1599,17 @@ class View {
         const markup = this._generateMarkup();
         this._clear();
         this._parentElement.insertAdjacentHTML("afterbegin", markup);
+    }
+    update(data) {
+        this._data = data;
+        const newMarkup = this._generateMarkup();
+        const newDOM = document.createRange().createContextualFragment(newMarkup);
+        const newElements = Array.from(newDOM.querySelectorAll("*"));
+        const currElements = Array.from(this._parentElement.querySelectorAll("*"));
+        newElements.forEach((newElem, i)=>{
+            const currElem = currElements[i];
+            console.log(currElem, newElem.isEqualNode(currElem));
+        });
     }
     _clear() {
         this._parentElement.innerHTML = "";
