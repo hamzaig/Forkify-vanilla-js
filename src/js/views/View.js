@@ -23,8 +23,20 @@ export default class View {
 
     newElements.forEach((newElem, i) => {
       const currElem = currElements[i];
-      console.log(currElem, newElem.isEqualNode(currElem));
+      // console.log(currElem, newElem.isEqualNode(currElem));
+      if (!newElem.isEqualNode(currElem) && newElem.firstChild?.nodeValue.trim() !== "") {
+        console.log(newElem.firstChild?.nodeValue.trim());
+        currElem.textContent = newElem.textContent;
+      }
+
+      if (!newElem.isEqualNode(currElem)) {
+        Array.from(newElem.attributes).forEach(attr => {
+          return currElem.setAttribute(attr.name, attr.value)
+        });
+      }
     })
+
+
 
   }
 

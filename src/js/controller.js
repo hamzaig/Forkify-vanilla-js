@@ -33,6 +33,8 @@ const controlRecipes = async () => {
     // loading Recipe
     recipeView.renderSpinner();
 
+    resultView.update(model.getSearchResultsPage())
+
     // Rendring Recipe
     await model.loadRecipe(id);
 

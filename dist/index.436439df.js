@@ -484,6 +484,7 @@ const controlRecipes = async ()=>{
         if (!id) return;
         // loading Recipe
         _recipeViewDefault.default.renderSpinner();
+        _resultViewDefault.default.update(_model.getSearchResultsPage());
         // Rendring Recipe
         await _model.loadRecipe(id);
         _recipeViewDefault.default.render(_model.state.recipe);
@@ -1608,7 +1609,14 @@ class View {
         const currElements = Array.from(this._parentElement.querySelectorAll("*"));
         newElements.forEach((newElem, i)=>{
             const currElem = currElements[i];
-            console.log(currElem, newElem.isEqualNode(currElem));
+            // console.log(currElem, newElem.isEqualNode(currElem));
+            if (!newElem.isEqualNode(currElem) && newElem.firstChild?.nodeValue.trim() !== "") {
+                console.log(newElem.firstChild?.nodeValue.trim());
+                currElem.textContent = newElem.textContent;
+            }
+            if (!newElem.isEqualNode(currElem)) Array.from(newElem.attributes).forEach((attr)=>{
+                return currElem.setAttribute(attr.name, attr.value);
+            });
         });
     }
     _clear() {
@@ -13650,7 +13658,9 @@ class ResultView extends _viewDefault.default {
         return this._data.map(this._generateMarkupReview).join("");
     }
     _generateMarkupReview(element) {
-        return ` <li class="preview">\n                    <a class="preview__link" href="#${element.id}">\n                    <figure class="preview__fig">\n                        <img src="${element.image}" alt="Image Not Found" />\n                    </figure>\n                    <div class="preview__data">\n                        <h4 class="preview__title">${element.title}</h4>\n                        <p class="preview__publisher">${element.publisher}</p>\n                    </div>\n                    </a>\n                </li>`;
+        const id = window.location.hash.slice(1);
+        console.log(element.id === id);
+        return ` <li class="preview">\n                    <a class="preview__link ${element.id === id ? "preview__link--active" : ""}" href="#${element.id}">\n                    <figure class="preview__fig">\n                        <img src="${element.image}" alt="Image Not Found" />\n                    </figure>\n                    <div class="preview__data">\n                        <h4 class="preview__title">${element.title}</h4>\n                        <p class="preview__publisher">${element.publisher}</p>\n                    </div>\n                    </a>\n                </li>`;
     }
 }
 exports.default = new ResultView();
