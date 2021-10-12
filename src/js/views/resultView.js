@@ -12,7 +12,7 @@ class ResultView extends View {
 
     _generateMarkupReview(element) {
         const id = window.location.hash.slice(1);
-        console.log(element.id === id);
+        // console.log(element.id === id);
         return (
             ` <li class="preview">
                     <a class="preview__link ${element.id === id ? "preview__link--active" : ""}" href="#${element.id}">

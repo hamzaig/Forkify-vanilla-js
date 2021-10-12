@@ -502,7 +502,7 @@ const controlSearchResults = async ()=>{
         if (!query) return;
         await _model.loadSearchResults(query);
         // console.log(model.state.search.results);
-        _resultViewDefault.default.render(_model.getSearchResultsPage(3));
+        _resultViewDefault.default.render(_model.getSearchResultsPage());
         _paginationViewDefault.default.render(_model.state.search);
     } catch (err) {
         console.log(err);
@@ -518,9 +518,16 @@ const controlServings = (newServings)=>{
     _recipeViewDefault.default.update(_model.state.recipe);
 // console.log(model.state);
 };
+const controlAddBookmark = ()=>{
+    if (!_model.state.recipe.bookmarked) _model.addBookmark(_model.state.recipe);
+    else if (_model.state.recipe.bookmarked) _model.deleteBookmark(_model.state.recipe.id);
+    console.log(_model.state.recipe);
+    _recipeViewDefault.default.update(_model.state.recipe);
+};
 function init() {
     _recipeViewDefault.default.addHandlerRender(controlRecipes);
     _recipeViewDefault.default.addHandlerUpdateServings(controlServings);
+    _recipeViewDefault.default.addHandlerAddBookmark(controlAddBookmark);
     _searchViewDefault.default.addHandlerSearch(controlSearchResults);
     _paginationViewDefault.default.addHanderClick(controlPagination);
 }
@@ -539,6 +546,10 @@ parcelHelpers.export(exports, "getSearchResultsPage", ()=>getSearchResultsPage
 );
 parcelHelpers.export(exports, "updateServings", ()=>updateServings
 );
+parcelHelpers.export(exports, "addBookmark", ()=>addBookmark
+);
+parcelHelpers.export(exports, "deleteBookmark", ()=>deleteBookmark
+);
 var _regeneratorRuntime = require("regenerator-runtime");
 var _config = require("./config");
 var _helpers = require("./helpers");
@@ -550,7 +561,8 @@ const state = {
         results: [],
         page: 1,
         resultsPerPage: _config.RESULT_PER_PAGE
-    }
+    },
+    bookmarks: []
 };
 const loadRecipe = async function(id) {
     try {
@@ -567,6 +579,9 @@ const loadRecipe = async function(id) {
             cookingTime: recipe.cooking_time,
             ingredients: recipe.ingredients
         };
+        if (state.bookmarks.some((bookmark)=>{
+            return bookmark.id === id;
+        })) state.recipe.bookmarked = true;
     // console.log(state.recipe);
     } catch (err) {
         console.log(err);
@@ -586,6 +601,7 @@ const loadSearchResults = async (query)=>{
                 image: row.image_url
             };
         });
+        state.search.page = 1;
     } catch (err) {
         console.log(err);
         throw err;
@@ -603,6 +619,18 @@ const updateServings = (newServings)=>{
         element.quantity = element.quantity * newServings / state.recipe.servings;
     });
     state.recipe.servings = newServings;
+};
+const addBookmark = (recipe)=>{
+    state.bookmarks.push(recipe);
+    if (recipe.id === state.recipe.id) state.recipe.bookmarked = true;
+};
+const deleteBookmark = (id)=>{
+    // Delete Bookmark
+    const index = state.bookmarks.findIndex((el)=>id === el.id
+    );
+    state.bookmarks.splice(index, 1);
+    //mark current recipe as not bookmarked
+    if (id === state.recipe.id) state.recipe.bookmarked = false;
 };
 
 },{"regenerator-runtime":"cH8Iq","./config":"beA2m","./helpers":"9l3Yy","@parcel/transformer-js/src/esmodule-helpers.js":"JacNc"}],"cH8Iq":[function(require,module,exports) {
@@ -1287,8 +1315,15 @@ class RecipeView extends _viewDefault.default {
             if (+updateTo > 0) handler(+updateTo);
         });
     }
+    addHandlerAddBookmark(handler) {
+        this._parentElement.addEventListener("click", (e)=>{
+            const btn = e.target.closest(".btn--bookmark");
+            if (!btn) return;
+            handler();
+        });
+    }
     _generateMarkup() {
-        return `\n      <figure class="recipe__fig">\n        <img src="${this._data.image}" alt="${this._data.title}" class="recipe__img" />\n        <h1 class="recipe__title">\n          <span>${this._data.title}</span>\n        </h1>\n      </figure>\n\n      <div class="recipe__details">\n        <div class="recipe__info">\n          <svg class="recipe__info-icon">\n            <use href="${_iconsSvgDefault.default}#icon-clock"></use>\n          </svg>\n          <span class="recipe__info-data recipe__info-data--minutes">${this._data.cookingTime}</span>\n          <span class="recipe__info-text">minutes</span>\n      </div>\n\n      <div class="recipe__info">\n        <svg class="recipe__info-icon">\n          <use href="${_iconsSvgDefault.default}#icon-users"></use>\n        </svg>\n        <span class="recipe__info-data recipe__info-data--people">${this._data.servings}</span>\n        <span class="recipe__info-text">servings</span>\n\n        <div class="recipe__info-buttons">\n          <button class="btn--tiny btn--update-servings" data-update-to="${this._data.servings - 1}">\n            <svg>\n              <use href="${_iconsSvgDefault.default}#icon-minus-circle"></use>\n            </svg>\n          </button>\n          <button class="btn--tiny btn--update-servings" data-update-to="${this._data.servings + 1}">\n            <svg>\n              <use href="${_iconsSvgDefault.default}#icon-plus-circle"></use>\n            </svg>\n          </button>\n        </div>\n      </div>\n\n      <div class="recipe__user-generated">\n        <svg>\n          <use href="${_iconsSvgDefault.default}#icon-user"></use>\n        </svg>\n      </div>\n      <button class="btn--round">\n        <svg class="">\n          <use href="${_iconsSvgDefault.default}#icon-bookmark-fill"></use>\n        </svg>\n      </button>\n      </div>\n\n      <div class="recipe__ingredients">\n        <h2 class="heading--2">Recipe ingredients</h2>\n        <ul class="recipe__ingredient-list">\n          ${this._data.ingredients.map(this._generateMarkupIngredient).join("")}\n        </ul>\n      </div>\n\n      <div class="recipe__directions">\n        <h2 class="heading--2">How to cook it</h2>\n        <p class="recipe__directions-text">\n          This recipe was carefully designed and tested by\n          <span class="recipe__publisher">${this._data.publisher}</span>. Please check out\n          directions at their website.\n        </p>\n        <a\n          class="btn--small recipe__btn"\n          href="${this._data.sourceUrl}"\n          target="_blank"\n        >\n          <span>Directions</span>\n          <svg class="search__icon">\n            <use href="${_iconsSvgDefault.default}#icon-arrow-right"></use>\n          </svg>\n        </a>\n      </div>\n    `;
+        return `\n      <figure class="recipe__fig">\n        <img src="${this._data.image}" alt="${this._data.title}" class="recipe__img" />\n        <h1 class="recipe__title">\n          <span>${this._data.title}</span>\n        </h1>\n      </figure>\n\n      <div class="recipe__details">\n        <div class="recipe__info">\n          <svg class="recipe__info-icon">\n            <use href="${_iconsSvgDefault.default}#icon-clock"></use>\n          </svg>\n          <span class="recipe__info-data recipe__info-data--minutes">${this._data.cookingTime}</span>\n          <span class="recipe__info-text">minutes</span>\n      </div>\n\n      <div class="recipe__info">\n        <svg class="recipe__info-icon">\n          <use href="${_iconsSvgDefault.default}#icon-users"></use>\n        </svg>\n        <span class="recipe__info-data recipe__info-data--people">${this._data.servings}</span>\n        <span class="recipe__info-text">servings</span>\n\n        <div class="recipe__info-buttons">\n          <button class="btn--tiny btn--update-servings" data-update-to="${this._data.servings - 1}">\n            <svg>\n              <use href="${_iconsSvgDefault.default}#icon-minus-circle"></use>\n            </svg>\n          </button>\n          <button class="btn--tiny btn--update-servings" data-update-to="${this._data.servings + 1}">\n            <svg>\n              <use href="${_iconsSvgDefault.default}#icon-plus-circle"></use>\n            </svg>\n          </button>\n        </div>\n      </div>\n\n      <div class="recipe__user-generated">\n        <svg>\n          <use href="${_iconsSvgDefault.default}#icon-user"></use>\n        </svg>\n      </div>\n      <button class="btn--round btn--bookmark">\n        <svg class="">\n          <use href="${_iconsSvgDefault.default}#icon-bookmark${this._data.bookmarked ? "-fill" : ""}"></use>\n        </svg>\n      </button>\n      </div>\n\n      <div class="recipe__ingredients">\n        <h2 class="heading--2">Recipe ingredients</h2>\n        <ul class="recipe__ingredient-list">\n          ${this._data.ingredients.map(this._generateMarkupIngredient).join("")}\n        </ul>\n      </div>\n\n      <div class="recipe__directions">\n        <h2 class="heading--2">How to cook it</h2>\n        <p class="recipe__directions-text">\n          This recipe was carefully designed and tested by\n          <span class="recipe__publisher">${this._data.publisher}</span>. Please check out\n          directions at their website.\n        </p>\n        <a\n          class="btn--small recipe__btn"\n          href="${this._data.sourceUrl}"\n          target="_blank"\n        >\n          <span>Directions</span>\n          <svg class="search__icon">\n            <use href="${_iconsSvgDefault.default}#icon-arrow-right"></use>\n          </svg>\n        </a>\n      </div>\n    `;
     }
     _generateMarkupIngredient(ing) {
         return `\n              <li class="recipe__ingredient">\n                <svg class="recipe__icon">\n                  <use href="${_iconsSvgDefault.default}#icon-check"></use>\n                </svg>\n                <div class="recipe__quantity">${ing.quantity ? new _fractional.Fraction(ing.quantity).toString() : ""}</div>\n                <div class="recipe__description">\n                  <span class="recipe__unit">${ing.unit}</span>\n                  ${ing.description}\n                </div>\n              </li>\n            `;
@@ -13659,7 +13694,7 @@ class ResultView extends _viewDefault.default {
     }
     _generateMarkupReview(element) {
         const id = window.location.hash.slice(1);
-        console.log(element.id === id);
+        // console.log(element.id === id);
         return ` <li class="preview">\n                    <a class="preview__link ${element.id === id ? "preview__link--active" : ""}" href="#${element.id}">\n                    <figure class="preview__fig">\n                        <img src="${element.image}" alt="Image Not Found" />\n                    </figure>\n                    <div class="preview__data">\n                        <h4 class="preview__title">${element.title}</h4>\n                        <p class="preview__publisher">${element.publisher}</p>\n                    </div>\n                    </a>\n                </li>`;
     }
 }
@@ -13685,7 +13720,6 @@ class PaginationView extends _viewDefault.default {
     _generateMarkup() {
         const currentPage = this._data.page;
         const numPages = Math.ceil(this._data.results.length / this._data.resultsPerPage);
-        console.log(numPages);
         if (currentPage === 1 && numPages > 1) return `\n                <button data-goto="${currentPage + 1}" class="btn--inline pagination__btn--next">\n                    <span>Page ${currentPage + 1}</span>\n                    <svg class="search__icon">\n                    <use href="src/img/icons.svg#icon-arrow-right"></use>\n                    </svg>\n                </button>\n            `;
         if (currentPage === numPages && numPages > 1) return `\n                <button data-goto="${currentPage - 1}" class="btn--inline pagination__btn--prev">\n                    <svg class="search__icon">\n                        <use href="src/img/icons.svg#icon-arrow-left"></use>\n                    </svg>\n                    <span>Page ${currentPage - 1}</span>\n                </button>\n            `;
         if (currentPage < numPages && numPages > 1) return `\n                <button data-goto="${currentPage - 1}" class="btn--inline pagination__btn--prev">\n                    <svg class="search__icon">\n                        <use href="src/img/icons.svg#icon-arrow-left"></use>\n                    </svg>\n                    <span>Page ${currentPage - 1}</span>\n                </button>\n                <button data-goto="${currentPage + 1}" class="btn--inline pagination__btn--next">\n                    <span>Page ${currentPage + 1}</span>\n                    <svg class="search__icon">\n                    <use href="src/img/icons.svg#icon-arrow-right"></use>\n                    </svg>\n                </button>\n            `;
