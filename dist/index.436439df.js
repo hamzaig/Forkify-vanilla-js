@@ -469,6 +469,8 @@ var _paginationView = require("./views/paginationView");
 var _paginationViewDefault = parcelHelpers.interopDefault(_paginationView);
 var _bookmarksView = require("./views/BookmarksView");
 var _bookmarksViewDefault = parcelHelpers.interopDefault(_bookmarksView);
+var _addRecipeView = require("./views/AddRecipeView");
+var _addRecipeViewDefault = parcelHelpers.interopDefault(_addRecipeView);
 const recipeContainer = document.querySelector('.recipe');
 const timeout = function(s) {
     return new Promise(function(_, reject) {
@@ -531,6 +533,9 @@ const controlAddBookmark = ()=>{
 const controlBookmarks = ()=>{
     _bookmarksViewDefault.default.render(_model.state.bookmarks);
 };
+const controlAddRecipe = (newRecipe)=>{
+    console.log(newRecipe);
+};
 function init() {
     _bookmarksViewDefault.default.addHandlerRander(controlBookmarks);
     _recipeViewDefault.default.addHandlerRender(controlRecipes);
@@ -538,10 +543,11 @@ function init() {
     _recipeViewDefault.default.addHandlerAddBookmark(controlAddBookmark);
     _searchViewDefault.default.addHandlerSearch(controlSearchResults);
     _paginationViewDefault.default.addHanderClick(controlPagination);
+    _addRecipeViewDefault.default.addHandlerUpload(controlAddRecipe);
 }
 init();
 
-},{"./model":"6Yfb5","./views/recipeView":"9q0mt","core-js/stable":"eIyVg","regenerator-runtime/runtime":"cH8Iq","./views/searchView":"51HTZ","./views/resultView":"dmYXU","./views/paginationView":"c2v8w","@parcel/transformer-js/src/esmodule-helpers.js":"JacNc","./views/BookmarksView":"2cKOE"}],"6Yfb5":[function(require,module,exports) {
+},{"./model":"6Yfb5","./views/recipeView":"9q0mt","core-js/stable":"eIyVg","regenerator-runtime/runtime":"cH8Iq","./views/searchView":"51HTZ","./views/resultView":"dmYXU","./views/paginationView":"c2v8w","@parcel/transformer-js/src/esmodule-helpers.js":"JacNc","./views/BookmarksView":"2cKOE","./views/AddRecipeView":"lJuh6"}],"6Yfb5":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "state", ()=>state
@@ -13770,6 +13776,50 @@ class BookmarksView extends _viewDefault.default {
 }
 exports.default = new BookmarksView();
 
-},{"./View":"8rtS4","url:../../img/icons.svg":"iwCpK","@parcel/transformer-js/src/esmodule-helpers.js":"JacNc"}]},["drOo7","jKMjS"], "jKMjS", "parcelRequire3a11")
+},{"./View":"8rtS4","url:../../img/icons.svg":"iwCpK","@parcel/transformer-js/src/esmodule-helpers.js":"JacNc"}],"lJuh6":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _view = require("./View");
+var _viewDefault = parcelHelpers.interopDefault(_view);
+class AddRecipeView extends _viewDefault.default {
+    _parentElement = document.querySelector('.upload');
+    _window = document.querySelector('.add-recipe-window');
+    _overlay = document.querySelector('.overlay');
+    _btnOpen = document.querySelector('.nav__btn--add-recipe');
+    _btnClose = document.querySelector('.btn--close-modal');
+    constructor(){
+        super();
+        // console.log(this._parentElement);
+        // console.log(this._btnClose);
+        this._addHandlerShowWindow();
+        this._addHandlerHideWindow();
+    // this._addHandlerUpload();
+    }
+    toggleWindlow() {
+        this._overlay.classList.toggle("hidden");
+        this._window.classList.toggle("hidden");
+    }
+    _addHandlerShowWindow() {
+        console.log("hello");
+        this._btnOpen.addEventListener("click", this.toggleWindlow.bind(this));
+    }
+    _addHandlerHideWindow() {
+        this._btnClose.addEventListener("click", this.toggleWindlow.bind(this));
+        this._overlay.addEventListener("click", this.toggleWindlow.bind(this));
+    }
+    addHandlerUpload(handler) {
+        this._parentElement.addEventListener("submit", function(e) {
+            e.preventDefault();
+            const dataArr = [
+                ...new FormData(this)
+            ];
+            const data = Object.fromEntries(dataArr);
+            handler(data);
+        });
+    }
+}
+exports.default = new AddRecipeView();
+
+},{"./View":"8rtS4","@parcel/transformer-js/src/esmodule-helpers.js":"JacNc"}]},["drOo7","jKMjS"], "jKMjS", "parcelRequire3a11")
 
 //# sourceMappingURL=index.436439df.js.map
