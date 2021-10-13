@@ -7,6 +7,7 @@ import resultView from "./views/resultView";
 import paginationView from "./views/paginationView";
 import BookmarksView from "./views/BookmarksView";
 import AddRecipeView from "./views/AddRecipeView";
+import { async } from "regenerator-runtime";
 
 
 const recipeContainer = document.querySelector('.recipe');
@@ -90,8 +91,25 @@ const controlBookmarks = () => {
   BookmarksView.render(model.state.bookmarks);
 }
 
-const controlAddRecipe = (newRecipe) => {
-  console.log(newRecipe);
+const controlAddRecipe = async (newRecipe) => {
+  // console.log(newRecipe);
+  try {
+    AddRecipeView.renderSpinner();
+
+    await model.uploadRecipe(newRecipe)
+
+    recipeView.render(model.state.recipe);
+
+    AddRecipeView.renderMessage();
+
+    setTimeout(() => {
+      AddRecipeView.toggleWindlow();
+    }, 2500);
+
+  } catch (err) {
+    console.log(err);
+    AddRecipeView.renderError(err.message)
+  }
 }
 
 function init() {
