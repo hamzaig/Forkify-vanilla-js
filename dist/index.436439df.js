@@ -562,7 +562,7 @@ function init() {
 }
 init();
 
-},{"./model":"6Yfb5","./views/recipeView":"9q0mt","core-js/stable":"eIyVg","regenerator-runtime/runtime":"cH8Iq","./views/searchView":"51HTZ","./views/resultView":"dmYXU","./views/paginationView":"c2v8w","@parcel/transformer-js/src/esmodule-helpers.js":"JacNc","./views/BookmarksView":"2cKOE","./views/AddRecipeView":"lJuh6","regenerator-runtime":"cH8Iq"}],"6Yfb5":[function(require,module,exports) {
+},{"./model":"6Yfb5","./views/recipeView":"9q0mt","core-js/stable":"eIyVg","regenerator-runtime/runtime":"cH8Iq","./views/searchView":"51HTZ","./views/resultView":"dmYXU","./views/paginationView":"c2v8w","./views/BookmarksView":"2cKOE","./views/AddRecipeView":"lJuh6","regenerator-runtime":"cH8Iq","@parcel/transformer-js/src/esmodule-helpers.js":"JacNc"}],"6Yfb5":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "state", ()=>state
