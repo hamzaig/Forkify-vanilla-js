@@ -32,7 +32,7 @@ const createRecipeObject = (data) => {
 export const loadRecipe = async function (id) {
     try {
 
-        const data = await getJSON(`${API_URL}${id}`);
+        const data = await getJSON(`${API_URL}${id}?key=${API_KEY}`);
         state.recipe = createRecipeObject(data);
 
 
@@ -53,7 +53,7 @@ export const loadRecipe = async function (id) {
 export const loadSearchResults = async (query) => {
     try {
         state.search.query = query;
-        const data = await getJSON(`${API_URL}?search=${query}`)
+        const data = await getJSON(`${API_URL}?search=${query}&key=${API_KEY}`)
         // console.log(data);
         state.search.results = data.data.recipes.map(row => {
             return {
